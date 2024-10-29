@@ -5,13 +5,8 @@ import (
 	"go-structurarium/stack"
 )
 
-type Person struct {
-	ID   int
-	Name string
-}
-
 func StackWrapperHelper() {
-	intStack := stack.NewStackWrapper[int]()
+	intStack := stack.NewWrapperStack[int]()
 	err := intStack.Push(10)
 	if err != nil {
 		fmt.Println("Error while pushing to intStack:", err)
@@ -38,6 +33,7 @@ func StackWrapperHelper() {
 	if err != nil {
 		fmt.Println("Error while clearing intStack:", err)
 	}
+	fmt.Println(intStack.IsEmpty())
 
 	personStack := stack.NewGenericStack[Person]()
 
