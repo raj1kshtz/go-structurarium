@@ -8,8 +8,8 @@ import (
 
 type StackWrapperTestSuite struct {
 	suite.Suite
-	intStack    *Wrapper[int]
-	stringStack *Wrapper[string]
+	intStack    *WrapperStack[int]
+	stringStack *WrapperStack[string]
 }
 
 func TestStackWrapperTestSuite(t *testing.T) {
@@ -17,11 +17,12 @@ func TestStackWrapperTestSuite(t *testing.T) {
 }
 
 func (s *StackWrapperTestSuite) SetupTest() {
-	s.intStack = NewStackWrapper[int]()
-	s.stringStack = NewStackWrapper[string]()
+	s.intStack = NewWrapperStack[int]()
+	s.stringStack = NewWrapperStack[string]()
 }
 
 func (s *StackWrapperTestSuite) TestIntegerStack() {
+	assert.Equal(s.T(), true, s.intStack.IsEmpty())
 	assert.NoError(s.T(), s.intStack.Push(10))
 	assert.NoError(s.T(), s.intStack.Push(20))
 
@@ -45,6 +46,7 @@ func (s *StackWrapperTestSuite) TestIntegerStack() {
 }
 
 func (s *StackWrapperTestSuite) TestStringStack() {
+	assert.Equal(s.T(), true, s.stringStack.IsEmpty())
 	assert.NoError(s.T(), s.stringStack.Push("Hello"))
 	assert.NoError(s.T(), s.stringStack.Push("World"))
 

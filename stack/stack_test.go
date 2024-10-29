@@ -105,3 +105,7 @@ func (s *GenericStackTestSuite) TestHelperFunctionReplyChanReceive() {
 	assert.Error(s.T(), err)
 	assert.Equal(s.T(), "test error", err.Error())
 }
+
+func (s *GenericStackTestSuite) TestIsEmpty() {
+	assert.Equal(s.T(), true, s.intStack.IsEmpty())
+}

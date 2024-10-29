@@ -45,6 +45,8 @@ func (s *GenericStack[T]) manageStack() {
 		case "clear":
 			data = make([]T, 0)
 			req.replyChan <- nil
+		case "isEmpty":
+			req.replyChan <- len(data) == 0
 		}
 	}
 }
@@ -89,7 +91,13 @@ func (s *GenericStack[T]) clear() error {
 	return replyChanReceive(replyChan)
 }
 
-// Wrapper methods
+func (q *GenericStack[T]) isEmpty() bool {
+	replyChan := make(chan interface{})
+	q.stackChan <- stackRequest[T]{action: "isEmpty", replyChan: replyChan}
+	return (<-replyChan).(bool)
+}
+
+// WrapperStack methods
 
 func (s *GenericStack[T]) Push(value T) error {
 	return s.push(value)
@@ -109,6 +117,10 @@ func (s *GenericStack[T]) Display() {
 
 func (s *GenericStack[T]) Clear() error {
 	return s.clear()
+}
+
+func (q *GenericStack[T]) IsEmpty() bool {
+	return q.isEmpty()
 }
 
 // Helper function to receive from the reply channel and handle errors
