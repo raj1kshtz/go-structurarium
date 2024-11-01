@@ -111,29 +111,3 @@ func replyChanReceive(replyChan chan interface{}) error {
 	}
 	return nil
 }
-
-// Wrapper method
-
-func (s *GenericStack[T]) Push(value T) error {
-	return s.push(value)
-}
-
-func (s *GenericStack[T]) Pop() (T, error) {
-	return s.pop()
-}
-
-func (s *GenericStack[T]) Peek() (T, error) {
-	return s.peek()
-}
-
-func (s *GenericStack[T]) Clear() error {
-	return s.clear()
-}
-
-func (s *GenericStack[T]) IsEmpty() bool {
-	return s.isEmpty()
-}
-
-func (s *GenericStack[T]) Size() int {
-	return s.size()
-}

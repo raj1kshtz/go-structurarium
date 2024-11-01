@@ -24,56 +24,56 @@ func (s *GenericQueueTestSuite) SetupTest() {
 }
 
 func (s *GenericQueueTestSuite) TestIntegerQueue() {
-	assert.NoError(s.T(), s.intQueue.Offer(10))
-	assert.NoError(s.T(), s.intQueue.AddFirst(20))
-	assert.NoError(s.T(), s.intQueue.AddLast(30))
-	assert.NoError(s.T(), s.intQueue.AddLast(40))
+	assert.NoError(s.T(), s.intQueue.offer(10))
+	assert.NoError(s.T(), s.intQueue.addFirst(20))
+	assert.NoError(s.T(), s.intQueue.addLast(30))
+	assert.NoError(s.T(), s.intQueue.addLast(40))
 
-	value, err := s.intQueue.Peek()
+	value, err := s.intQueue.peek()
 	assert.NoError(s.T(), err)
 	assert.Equal(s.T(), 20, value)
 
-	value, err = s.intQueue.Poll()
+	value, err = s.intQueue.poll()
 	assert.NoError(s.T(), err)
 	assert.Equal(s.T(), 20, value)
 
-	value, err = s.intQueue.PollFirst()
+	value, err = s.intQueue.pollFirst()
 	assert.NoError(s.T(), err)
 	assert.Equal(s.T(), 10, value)
 
-	value, err = s.intQueue.PollLast()
+	value, err = s.intQueue.pollLast()
 	assert.NoError(s.T(), err)
 	assert.Equal(s.T(), 40, value)
 
-	value = s.intQueue.Size()
+	value = s.intQueue.size()
 	assert.Equal(s.T(), 1, value)
 
-	_, err = s.intQueue.Poll()
+	_, err = s.intQueue.poll()
 	assert.NoError(s.T(), err)
 }
 
 func (s *GenericQueueTestSuite) TestPeekEmptyQueue() {
-	_, err := s.intQueue.Peek()
+	_, err := s.intQueue.peek()
 	assert.Error(s.T(), err)
 	assert.Equal(s.T(), "queue is empty", err.Error())
 }
 
 func (s *GenericQueueTestSuite) TestPollFirstEmptyQueue() {
-	_, err := s.intQueue.PollFirst()
+	_, err := s.intQueue.pollFirst()
 	assert.Error(s.T(), err)
 	assert.Equal(s.T(), "queue is empty", err.Error())
 }
 
 func (s *GenericQueueTestSuite) TestPollLastEmptyQueue() {
-	_, err := s.intQueue.PollLast()
+	_, err := s.intQueue.pollLast()
 	assert.Error(s.T(), err)
 	assert.Equal(s.T(), "queue is empty", err.Error())
 }
 
 func (s *GenericQueueTestSuite) TestDisplay() {
-	assert.NoError(s.T(), s.intQueue.Offer(1))
-	assert.NoError(s.T(), s.intQueue.Offer(2))
-	assert.NoError(s.T(), s.intQueue.Offer(3))
+	assert.NoError(s.T(), s.intQueue.offer(1))
+	assert.NoError(s.T(), s.intQueue.offer(2))
+	assert.NoError(s.T(), s.intQueue.offer(3))
 
 	expectedOutput := "[1 2 3]"
 	assert.Equal(s.T(), expectedOutput, s.intQueue.display())
@@ -98,50 +98,50 @@ func (s *GenericQueueTestSuite) TestHelperFunctionReplyChanReceive() {
 }
 
 func (s *GenericQueueTestSuite) TestClear() {
-	assert.NoError(s.T(), s.intQueue.Offer(5))
-	assert.NoError(s.T(), s.intQueue.Offer(10))
-	assert.NoError(s.T(), s.intQueue.AddFirst(10))
-	assert.NoError(s.T(), s.intQueue.AddLast(10))
+	assert.NoError(s.T(), s.intQueue.offer(5))
+	assert.NoError(s.T(), s.intQueue.offer(10))
+	assert.NoError(s.T(), s.intQueue.addFirst(10))
+	assert.NoError(s.T(), s.intQueue.addLast(10))
 
-	_, err := s.intQueue.PollFirst()
+	_, err := s.intQueue.pollFirst()
 	assert.NoError(s.T(), err)
 
-	_, err = s.intQueue.PollLast()
+	_, err = s.intQueue.pollLast()
 	assert.NoError(s.T(), err)
 
-	assert.Equal(s.T(), 2, s.intQueue.Size())
+	assert.Equal(s.T(), 2, s.intQueue.size())
 
-	assert.NoError(s.T(), s.intQueue.Clear())
+	assert.NoError(s.T(), s.intQueue.clear())
 
-	_, err = s.intQueue.Peek()
+	_, err = s.intQueue.peek()
 	assert.Error(s.T(), err)
 	assert.Equal(s.T(), "queue is empty", err.Error())
 
-	_, err = s.intQueue.PollLast()
+	_, err = s.intQueue.pollLast()
 	assert.Error(s.T(), err)
 	assert.Equal(s.T(), "queue is empty", err.Error())
 }
 
 func (s *GenericQueueTestSuite) TestSizeEmptyQueue() {
-	assert.Equal(s.T(), 0, s.intQueue.Size())
+	assert.Equal(s.T(), 0, s.intQueue.size())
 }
 
 func (s *GenericQueueTestSuite) TestAddFirstOnEmptyQueue() {
-	assert.NoError(s.T(), s.intQueue.AddFirst(100))
-	assert.Equal(s.T(), 1, s.intQueue.Size())
+	assert.NoError(s.T(), s.intQueue.addFirst(100))
+	assert.Equal(s.T(), 1, s.intQueue.size())
 }
 
 func (s *GenericQueueTestSuite) TestAddLastOnEmptyQueue() {
-	assert.NoError(s.T(), s.intQueue.AddLast(200))
-	assert.Equal(s.T(), 1, s.intQueue.Size())
+	assert.NoError(s.T(), s.intQueue.addLast(200))
+	assert.Equal(s.T(), 1, s.intQueue.size())
 }
 
 func (s *GenericQueueTestSuite) TestPollEmptyQueue() {
-	_, err := s.intQueue.Poll()
+	_, err := s.intQueue.poll()
 	assert.Error(s.T(), err)
 	assert.Equal(s.T(), "queue is empty", err.Error())
 }
 
 func (s *GenericQueueTestSuite) TestIsEmpty() {
-	assert.Equal(s.T(), true, s.intQueue.IsEmpty())
+	assert.Equal(s.T(), true, s.intQueue.isEmpty())
 }

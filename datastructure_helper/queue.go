@@ -6,7 +6,7 @@ import (
 )
 
 func QueueWrapperHelper() {
-	intQueue := queue.NewGenericQueue[int]()
+	intQueue := queue.NewWrapperQueue[int]()
 	err := intQueue.Offer(20)
 	if err != nil {
 		fmt.Println("Error with offering to intQueue", err)
@@ -60,7 +60,7 @@ func QueueWrapperHelper() {
 
 	fmt.Println("intQueue IsEmpty", intQueue.IsEmpty())
 
-	personQueue := queue.NewGenericQueue[Person]()
+	personQueue := queue.NewWrapperQueue[Person]()
 	err = personQueue.Offer(Person{ID: 1, Name: "Alice"})
 	if err != nil {
 		fmt.Println("Error with offering to personQueue:", err)

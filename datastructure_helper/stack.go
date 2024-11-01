@@ -15,7 +15,6 @@ func StackWrapperHelper() {
 	if err != nil {
 		fmt.Println("Error while pushing to intStack:", err)
 	}
-	intStack.Display()
 
 	value, err := intStack.Pop()
 	if err == nil {
@@ -24,18 +23,17 @@ func StackWrapperHelper() {
 		fmt.Println("Error popping from intstack:", err)
 	}
 
-	top, err := intStack.Top()
+	top, err := intStack.Peek()
 	if err == nil {
 		fmt.Println("Top element is :", top)
 	}
-	intStack.Display()
 	err = intStack.Clear()
 	if err != nil {
 		fmt.Println("Error while clearing intStack:", err)
 	}
 	fmt.Println(intStack.IsEmpty())
 
-	personStack := stack.NewGenericStack[Person]()
+	personStack := stack.NewWrapperStack[Person]()
 
 	person1 := Person{ID: 1, Name: "John"}
 	person2 := Person{ID: 2, Name: "Doe"}
@@ -49,7 +47,6 @@ func StackWrapperHelper() {
 		fmt.Println("Error pushing Doe to stack:", err)
 	}
 
-	personStack.Display()
 	poppedPerson, err := personStack.Pop()
 	if err == nil {
 		fmt.Printf("Popped Person: %+v\n", poppedPerson)
@@ -57,13 +54,12 @@ func StackWrapperHelper() {
 		fmt.Println("Error popping from person stack:", err)
 	}
 
-	topPerson, err := personStack.Top()
+	topPerson, err := personStack.Peek()
 	if err == nil {
 		fmt.Printf("Top Person: %+v\n", topPerson)
 	} else {
 		fmt.Println("Error getting top person:", err)
 	}
-	personStack.Display()
 	err = personStack.Clear()
 	if err != nil {
 		fmt.Println("Error while clearing personStack:", err)
