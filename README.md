@@ -9,3 +9,7 @@ To use this library in your Go project, you can get it via:
 
 ```bash
 go get github.com/raj1kshtz/go-structurarium
+```
+
+### Note
+Make use of _wrapper function to make use of functionality

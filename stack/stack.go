@@ -1,6 +1,9 @@
 package stack
 
-import "fmt"
+import (
+	"fmt"
+	"go-structurarium/vector"
+)
 
 type stackRequest[T any] struct {
 	action    string
@@ -9,95 +12,107 @@ type stackRequest[T any] struct {
 }
 
 type GenericStack[T any] struct {
-	stackChan chan stackRequest[T]
+	stackChan     chan stackRequest[T]
+	vectorWrapper *vector.WrapperVector[T]
 }
 
-func NewGenericStack[T any]() *GenericStack[T] {
-	s := &GenericStack[T]{stackChan: make(chan stackRequest[T])}
+func NewGenericStack[T any](initialCapacity ...int) *GenericStack[T] {
+	var capacity int
+	if len(initialCapacity) > 0 {
+		capacity = initialCapacity[0]
+	} else {
+		capacity = 0
+	}
+	s := &GenericStack[T]{
+		stackChan:     make(chan stackRequest[T]),
+		vectorWrapper: vector.NewWrapperVector[T](capacity),
+	}
 	go s.manageStack()
 	return s
 }
 
 func (s *GenericStack[T]) manageStack() {
-	data := make([]T, 0)
-
 	for req := range s.stackChan {
 		switch req.action {
 		case "push":
-			data = append(data, req.value)
-			req.replyChan <- nil
+			if err := s.push(req.value); err != nil {
+				req.replyChan <- err
+			} else {
+				req.replyChan <- nil
+			}
 		case "pop":
-			if len(data) == 0 {
-				req.replyChan <- fmt.Errorf("stack underflow")
-			} else {
-				value := data[len(data)-1]
-				data = data[:len(data)-1]
-				req.replyChan <- value
+			value, err := s.pop()
+			req.replyChan <- value
+			if err != nil {
+				req.replyChan <- err
 			}
-		case "top":
-			if len(data) == 0 {
-				req.replyChan <- fmt.Errorf("stack is empty")
-			} else {
-				req.replyChan <- data[len(data)-1]
+		case "peek":
+			value, err := s.peek()
+			req.replyChan <- value
+			if err != nil {
+				req.replyChan <- err
 			}
-		case "display":
-			req.replyChan <- fmt.Sprintf("%v", data)
 		case "clear":
-			data = make([]T, 0)
-			req.replyChan <- nil
+			if err := s.clear(); err != nil {
+				req.replyChan <- err
+			} else {
+				req.replyChan <- nil
+			}
 		case "isEmpty":
-			req.replyChan <- len(data) == 0
+			req.replyChan <- s.isEmpty()
+		case "size":
+			req.replyChan <- s.size()
 		}
 	}
 }
 
 func (s *GenericStack[T]) push(value T) error {
-	replyChan := make(chan interface{})
-	s.stackChan <- stackRequest[T]{action: "push", value: value, replyChan: replyChan}
-	return replyChanReceive(replyChan)
+	return s.vectorWrapper.Add(value)
 }
 
 func (s *GenericStack[T]) pop() (T, error) {
-	replyChan := make(chan interface{})
-	s.stackChan <- stackRequest[T]{action: "pop", replyChan: replyChan}
-	result := <-replyChan
-	if err, ok := result.(error); ok {
+	if s.vectorWrapper.IsEmpty() {
+		var zero T
+		return zero, fmt.Errorf("stack underflow")
+	}
+	value, err := s.vectorWrapper.Get(s.vectorWrapper.Size() - 1)
+	if err != nil {
 		var zero T
 		return zero, err
 	}
-	return result.(T), nil
+	_ = s.vectorWrapper.RemoveAt(s.vectorWrapper.Size() - 1)
+	return value, nil
 }
 
-func (s *GenericStack[T]) top() (T, error) {
-	replyChan := make(chan interface{})
-	s.stackChan <- stackRequest[T]{action: "top", replyChan: replyChan}
-	result := <-replyChan
-	if err, ok := result.(error); ok {
+func (s *GenericStack[T]) peek() (T, error) {
+	if s.vectorWrapper.IsEmpty() {
 		var zero T
-		return zero, err
+		return zero, fmt.Errorf("stack is empty")
 	}
-	return result.(T), nil
-}
-
-func (s *GenericStack[T]) display() string {
-	replyChan := make(chan interface{})
-	s.stackChan <- stackRequest[T]{action: "display", replyChan: replyChan}
-	return (<-replyChan).(string)
+	return s.vectorWrapper.Get(s.vectorWrapper.Size() - 1)
 }
 
 func (s *GenericStack[T]) clear() error {
-	replyChan := make(chan interface{})
-	s.stackChan <- stackRequest[T]{action: "clear", replyChan: replyChan}
-	return replyChanReceive(replyChan)
+	return s.vectorWrapper.Clear()
 }
 
-func (q *GenericStack[T]) isEmpty() bool {
-	replyChan := make(chan interface{})
-	q.stackChan <- stackRequest[T]{action: "isEmpty", replyChan: replyChan}
-	return (<-replyChan).(bool)
+func (s *GenericStack[T]) isEmpty() bool {
+	return s.vectorWrapper.IsEmpty()
 }
 
-// WrapperStack methods
+func (s *GenericStack[T]) size() int {
+	return s.vectorWrapper.Size()
+}
+
+func replyChanReceive(replyChan chan interface{}) error {
+	result := <-replyChan
+	if err, ok := result.(error); ok {
+		return err
+	}
+	return nil
+}
+
+// Wrapper method
 
 func (s *GenericStack[T]) Push(value T) error {
 	return s.push(value)
@@ -107,27 +122,18 @@ func (s *GenericStack[T]) Pop() (T, error) {
 	return s.pop()
 }
 
-func (s *GenericStack[T]) Top() (T, error) {
-	return s.top()
-}
-
-func (s *GenericStack[T]) Display() {
-	fmt.Println(s.display())
+func (s *GenericStack[T]) Peek() (T, error) {
+	return s.peek()
 }
 
 func (s *GenericStack[T]) Clear() error {
 	return s.clear()
 }
 
-func (q *GenericStack[T]) IsEmpty() bool {
-	return q.isEmpty()
+func (s *GenericStack[T]) IsEmpty() bool {
+	return s.isEmpty()
 }
 
-// Helper function to receive from the reply channel and handle errors
-func replyChanReceive(replyChan chan interface{}) error {
-	result := <-replyChan
-	if err, ok := result.(error); ok {
-		return err
-	}
-	return nil
+func (s *GenericStack[T]) Size() int {
+	return s.size()
 }

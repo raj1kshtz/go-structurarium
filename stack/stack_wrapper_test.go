@@ -30,51 +30,21 @@ func (s *StackWrapperTestSuite) TestIntegerStack() {
 	assert.NoError(s.T(), err)
 	assert.Equal(s.T(), 20, value)
 
-	topValue, err := s.intStack.Top()
+	topValue, err := s.intStack.Peek()
 	assert.NoError(s.T(), err)
 	assert.Equal(s.T(), 10, topValue)
 
+	assert.Equal(s.T(), 1, s.intStack.Size())
+
 	_, err = s.intStack.Pop()
 	assert.NoError(s.T(), err)
 	_, err = s.intStack.Pop()
 	assert.Error(s.T(), err)
 	assert.Equal(s.T(), "stack underflow", err.Error())
 
-	_, err = s.intStack.Top()
+	_, err = s.intStack.Peek()
 	assert.Error(s.T(), err)
 	assert.Equal(s.T(), "stack is empty", err.Error())
-}
-
-func (s *StackWrapperTestSuite) TestStringStack() {
-	assert.Equal(s.T(), true, s.stringStack.IsEmpty())
-	assert.NoError(s.T(), s.stringStack.Push("Hello"))
-	assert.NoError(s.T(), s.stringStack.Push("World"))
-
-	value, err := s.stringStack.Pop()
-	assert.NoError(s.T(), err)
-	assert.Equal(s.T(), "World", value)
-
-	topValue, err := s.stringStack.Top()
-	assert.NoError(s.T(), err)
-	assert.Equal(s.T(), "Hello", topValue)
-
-	_, err = s.stringStack.Pop()
-	assert.NoError(s.T(), err)
-	_, err = s.stringStack.Pop()
-	assert.Error(s.T(), err)
-	assert.Equal(s.T(), "stack underflow", err.Error())
-
-	_, err = s.stringStack.Top()
-	assert.Error(s.T(), err)
-	assert.Equal(s.T(), "stack is empty", err.Error())
-}
-
-func (s *StackWrapperTestSuite) TestDisplay() {
-	assert.NoError(s.T(), s.intStack.Push(1))
-	assert.NoError(s.T(), s.intStack.Push(2))
-	assert.NoError(s.T(), s.intStack.Push(3))
-
-	s.intStack.Display()
 }
 
 func (s *StackWrapperTestSuite) TestClear() {

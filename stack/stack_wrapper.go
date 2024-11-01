@@ -20,18 +20,18 @@ func (sw *WrapperStack[T]) Pop() (T, error) {
 }
 
 // Top returns the top element of the stack without removing it
-func (sw *WrapperStack[T]) Top() (T, error) {
-	return sw.stack.Top()
-}
-
-// Display shows all elements in the stack
-func (sw *WrapperStack[T]) Display() {
-	sw.stack.Display()
+func (sw *WrapperStack[T]) Peek() (T, error) {
+	return sw.stack.Peek()
 }
 
 // Clear empties the stack and return error
 func (sw *WrapperStack[T]) Clear() error {
 	return sw.stack.Clear()
+}
+
+// Size  returns size of stack
+func (sw *WrapperStack[T]) Size() int {
+	return sw.stack.Size()
 }
 
 func (sw *WrapperStack[T]) IsEmpty() bool {
