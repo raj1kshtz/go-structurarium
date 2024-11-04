@@ -1,25 +1,23 @@
-name: Go Structurarium CI
+name: Go CI
 
 on:
   pull_request:
-    branches:
-      - main
+    branches: [ master ]
   push:
-    branches:
-      - main
+    branches: [ master ]
 
 jobs:
-  build:
+  test_and_build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - name: Check out code
+        uses: actions/checkout@v3
 
       - name: Set up Go
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v4
         with:
-          go-version: '1.23.2' # Ensure this matches your Go version
+          go-version: '1.23.2'
 
       - name: Install dependencies
         run: go mod tidy
@@ -27,23 +25,13 @@ jobs:
       - name: Run tests
         run: |
           mkdir -p test-reports
-          go test -v ./... | tee test-reports/test-report.txt
+          go test -v ./... | tee test-reports/test-output.txt
 
-      - name: Upload test report
-        if: always()
+      - name: Upload test results
         uses: actions/upload-artifact@v3
         with:
-          name: test-report
-          path: test-reports/test-report.txt
+          name: test-reports
+          path: test-reports/test-output.txt
 
-  check:
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Verify Tests
-        run: echo "All tests must pass for merge to proceed."
-
+      - name: Build project
+        run: go build ./...
