@@ -1,141 +1,106 @@
 package queue
 
-import "fmt"
+import (
+	"go-structurarium/collection"
+)
 
-type queueRequest[T any] struct {
+type queueRequest[T comparable] struct {
 	action    string
 	value     T
 	replyChan chan interface{}
 }
 
-type GenericQueue[T any] struct {
-	queueChan chan queueRequest[T]
+type GenericQueue[T comparable] struct {
+	queueChan         chan queueRequest[T]
+	collectionWrapper *collection.GenericCollectionWrapper[T]
 }
 
-func NewGenericQueue[T any]() *GenericQueue[T] {
-	s := &GenericQueue[T]{queueChan: make(chan queueRequest[T])}
+func NewGenericQueue[T comparable](initialCapacity ...int) *GenericQueue[T] {
+	var capacity int
+	if len(initialCapacity) > 0 {
+		capacity = initialCapacity[0]
+	} else {
+		capacity = 0
+	}
+	s := &GenericQueue[T]{
+		queueChan:         make(chan queueRequest[T]),
+		collectionWrapper: collection.NewGenericCollectionWrapper[T](capacity),
+	}
+
 	go s.manageQueue()
 	return s
 }
 
 func (q *GenericQueue[T]) manageQueue() {
-	data := make([]T, 0)
-
 	for req := range q.queueChan {
 		switch req.action {
-		case "addFirst":
-			data = append([]T{req.value}, data...)
-			req.replyChan <- nil
-		case "addLast", "offer":
-			data = append(data, req.value)
-			req.replyChan <- nil
-		case "peek":
-			if len(data) == 0 {
-				req.replyChan <- fmt.Errorf("queue is empty")
+		case "enQueue":
+			if ok := q.enQueue(req.value); !ok {
+				req.replyChan <- "Unable to push data to queue"
 			} else {
-				req.replyChan <- data[0]
+				req.replyChan <- true
 			}
-		case "pollFirst", "poll":
-			if len(data) == 0 {
-				req.replyChan <- fmt.Errorf("queue is empty")
-			} else {
-				value := data[0]
-				data = data[1:]
-				req.replyChan <- value
-			}
-		case "pollLast":
-			if len(data) == 0 {
-				req.replyChan <- fmt.Errorf("queue is empty")
-			} else {
-				value := data[len(data)-1]
-				data = data[:len(data)-1]
-				req.replyChan <- value
-			}
-		case "display":
-			req.replyChan <- fmt.Sprintf("%v", data)
+		case "deQueue":
+			val, ok := q.deQueue()
+			req.replyChan <- val
+			req.replyChan <- ok
 		case "size":
-			req.replyChan <- len(data)
-		case "clear":
-			data = make([]T, 0)
-			req.replyChan <- nil
+			req.replyChan <- q.size()
 		case "isEmpty":
-			req.replyChan <- len(data) == 0
+			req.replyChan <- q.isEmpty()
+		case "peek":
+			req.replyChan <- q.peek()
+		case "clear":
+			q.clear()
+		case "toArray":
+			req.replyChan <- q.toArray()
+
 		}
 	}
 }
 
-func (q *GenericQueue[T]) addFirst(value T) error {
-	replyChan := make(chan interface{})
-	q.queueChan <- queueRequest[T]{action: "addFirst", value: value, replyChan: replyChan}
-	return replyChanReceive(replyChan)
+func (q *GenericQueue[T]) enQueue(value T) bool {
+	return q.collectionWrapper.Add(value)
 }
 
-func (q *GenericQueue[T]) addLast(value T) error {
-	replyChan := make(chan interface{})
-	q.queueChan <- queueRequest[T]{action: "addLast", value: value, replyChan: replyChan}
-	return replyChanReceive(replyChan)
-}
-
-func (q *GenericQueue[T]) offer(value T) error {
-	replyChan := make(chan interface{})
-	q.queueChan <- queueRequest[T]{action: "offer", value: value, replyChan: replyChan}
-	return replyChanReceive(replyChan)
-}
-
-func (q *GenericQueue[T]) peek() (T, error) {
-	replyChan := make(chan interface{})
-	q.queueChan <- queueRequest[T]{action: "peek", replyChan: replyChan}
-	result := <-replyChan
-	if err, ok := result.(error); ok {
-		var zero T
-		return zero, err
+func (q *GenericQueue[T]) deQueue() (T, bool) {
+	var zero T
+	if q.isEmpty() {
+		return zero, false
 	}
-	return result.(T), nil
-}
-
-func (q *GenericQueue[T]) poll() (T, error) {
-	replyChan := make(chan interface{})
-	q.queueChan <- queueRequest[T]{action: "pollFirst", replyChan: replyChan}
-	result := <-replyChan
-	if err, ok := result.(error); ok {
-		var zero T
-		return zero, err
+	frontElement := q.peek()
+	if frontElement == zero {
+		return zero, false
 	}
-	return result.(T), nil
-}
-
-func (q *GenericQueue[T]) pollFirst() (T, error) {
-	replyChan := make(chan interface{})
-	q.queueChan <- queueRequest[T]{action: "pollFirst", replyChan: replyChan}
-	result := <-replyChan
-	if err, ok := result.(error); ok {
-		var zero T
-		return zero, err
+	success := q.collectionWrapper.Remove(frontElement)
+	if success {
+		return frontElement, true
 	}
-	return result.(T), nil
-}
-
-func (q *GenericQueue[T]) pollLast() (T, error) {
-	replyChan := make(chan interface{})
-	q.queueChan <- queueRequest[T]{action: "pollLast", replyChan: replyChan}
-	result := <-replyChan
-	if err, ok := result.(error); ok {
-		var zero T
-		return zero, err
-	}
-	return result.(T), nil
-}
-
-func (q *GenericQueue[T]) display() string {
-	replyChan := make(chan interface{})
-	q.queueChan <- queueRequest[T]{action: "display", replyChan: replyChan}
-	return (<-replyChan).(string)
+	return zero, false
 }
 
 func (q *GenericQueue[T]) size() int {
-	replyChan := make(chan interface{})
-	q.queueChan <- queueRequest[T]{action: "size", replyChan: replyChan}
-	return (<-replyChan).(int)
+	return q.collectionWrapper.Size()
+}
+
+func (q *GenericQueue[T]) isEmpty() bool {
+	return q.collectionWrapper.IsEmpty()
+}
+
+func (q *GenericQueue[T]) peek() T {
+	if q.isEmpty() {
+		var zeroValue T
+		return zeroValue
+	}
+	return q.collectionWrapper.ToArray()[0]
+}
+
+func (q *GenericQueue[T]) clear() {
+	q.collectionWrapper.Clear()
+}
+
+func (q *GenericQueue[T]) toArray() []T {
+	return q.collectionWrapper.ToArray()
 }
 
 func replyChanReceive(replyChan chan interface{}) error {
@@ -144,16 +109,4 @@ func replyChanReceive(replyChan chan interface{}) error {
 		return err
 	}
 	return nil
-}
-
-func (q *GenericQueue[T]) clear() error {
-	replyChan := make(chan interface{})
-	q.queueChan <- queueRequest[T]{action: "clear", replyChan: replyChan}
-	return replyChanReceive(replyChan)
-}
-
-func (q *GenericQueue[T]) isEmpty() bool {
-	replyChan := make(chan interface{})
-	q.queueChan <- queueRequest[T]{action: "isEmpty", replyChan: replyChan}
-	return (<-replyChan).(bool)
 }
