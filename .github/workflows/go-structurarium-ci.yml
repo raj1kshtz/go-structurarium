@@ -2,9 +2,9 @@ name: Go CI
 
 on:
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
   push:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
   test_and_build:
@@ -13,25 +13,31 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v3
+        continue-on-error: false
 
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
           go-version: '1.23.2'
+        continue-on-error: false
 
       - name: Install dependencies
         run: go mod tidy
+        continue-on-error: false
 
       - name: Run tests
         run: |
           mkdir -p test-reports
           go test -v ./... | tee test-reports/test-output.txt
+        continue-on-error: false
 
       - name: Upload test results
         uses: actions/upload-artifact@v3
         with:
           name: test-reports
           path: test-reports/test-output.txt
+        continue-on-error: false
 
       - name: Build project
         run: go build ./...
+        continue-on-error: false
