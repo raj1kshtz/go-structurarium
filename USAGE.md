@@ -571,6 +571,289 @@ func main() {
 }
 ```
 
+## Tree (N-ary Tree)
+
+A generic tree structure where each node can have any number of children.
+
+### Basic Usage
+
+```go
+package main
+
+import (
+    "fmt"
+    "github.com/raj1kshtz/go-structurarium/tree"
+)
+
+func main() {
+    // Create a tree with root value 1
+    t := tree.NewTreeWrapper[int](1)
+    
+    // Add children to root
+    t.Insert(1, 2)
+    t.Insert(1, 3)
+    t.Insert(1, 4)
+    
+    // Add grandchildren
+    t.Insert(2, 5)
+    t.Insert(2, 6)
+    t.Insert(3, 7)
+    
+    fmt.Println("Tree size:", t.Size())        // Output: 7
+    fmt.Println("Tree height:", t.Height())    // Output: 3
+    
+    // Check if value exists
+    fmt.Println("Contains 5:", t.Search(5))    // Output: true
+    fmt.Println("Contains 99:", t.Search(99))  // Output: false
+}
+```
+
+### Tree Traversals
+
+```go
+package main
+
+import (
+    "fmt"
+    "github.com/raj1kshtz/go-structurarium/tree"
+)
+
+func main() {
+    t := tree.NewTreeWrapper[int](1)
+    t.Insert(1, 2)
+    t.Insert(1, 3)
+    t.Insert(2, 4)
+    t.Insert(2, 5)
+    t.Insert(3, 6)
+    
+    // Pre-order: root, then children
+    fmt.Println("Pre-order:", t.PreOrder())
+    // Output: [1 2 4 5 3 6]
+    
+    // Post-order: children, then root
+    fmt.Println("Post-order:", t.PostOrder())
+    // Output: [4 5 2 6 3 1]
+    
+    // Level-order: breadth-first
+    fmt.Println("Level-order:", t.LevelOrder())
+    // Output: [1 2 3 4 5 6]
+}
+```
+
+### File System Example
+
+```go
+package main
+
+import (
+    "fmt"
+    "github.com/raj1kshtz/go-structurarium/tree"
+)
+
+func main() {
+    // Create a file system structure
+    fs := tree.NewTreeWrapper[string]("root")
+    
+    // Add directories
+    fs.Insert("root", "home")
+    fs.Insert("root", "usr")
+    fs.Insert("root", "var")
+    
+    // Add subdirectories
+    fs.Insert("home", "user1")
+    fs.Insert("home", "user2")
+    fs.Insert("usr", "bin")
+    fs.Insert("usr", "lib")
+    fs.Insert("var", "log")
+    
+    // Add files
+    fs.Insert("user1", "documents")
+    fs.Insert("user1", "downloads")
+    
+    // Display structure
+    fmt.Println("File system structure (level-order):")
+    for _, item := range fs.LevelOrder() {
+        fmt.Println("-", item)
+    }
+    
+    // Check if path exists
+    if fs.Search("documents") {
+        fmt.Println("documents found in the file system")
+    }
+    
+    // Remove a directory and its contents
+    fs.Remove("user2")
+    fmt.Println("After removing user2, size:", fs.Size())
+}
+```
+
+## Binary Search Tree (BST)
+
+A self-organizing binary tree where left children are smaller and right children are larger than their parent.
+
+### Basic Usage
+
+```go
+package main
+
+import (
+    "fmt"
+    "github.com/raj1kshtz/go-structurarium/tree"
+)
+
+func main() {
+    // Create an empty BST
+    bst := tree.NewBSTWrapper[int]()
+    
+    // Insert values
+    bst.Insert(50)
+    bst.Insert(30)
+    bst.Insert(70)
+    bst.Insert(20)
+    bst.Insert(40)
+    bst.Insert(60)
+    bst.Insert(80)
+    
+    // Search for values
+    fmt.Println("Contains 40:", bst.Search(40))   // Output: true
+    fmt.Println("Contains 100:", bst.Search(100)) // Output: false
+    
+    // Get min and max
+    min, _ := bst.Min()
+    max, _ := bst.Max()
+    fmt.Println("Min:", min) // Output: 20
+    fmt.Println("Max:", max) // Output: 80
+    
+    // Get sorted values (in-order traversal)
+    fmt.Println("Sorted:", bst.InOrder())
+    // Output: [20 30 40 50 60 70 80]
+}
+```
+
+### BST Operations
+
+```go
+package main
+
+import (
+    "fmt"
+    "github.com/raj1kshtz/go-structurarium/tree"
+)
+
+func main() {
+    bst := tree.NewBSTWrapper[int]()
+    
+    // Insert multiple values
+    values := []int{50, 30, 70, 20, 40, 60, 80}
+    for _, v := range values {
+        bst.Insert(v)
+    }
+    
+    fmt.Println("Size:", bst.Size())     // Output: 7
+    fmt.Println("Height:", bst.Height()) // Output: 3
+    
+    // Delete operations
+    bst.Delete(20) // Delete leaf node
+    bst.Delete(30) // Delete node with one child
+    bst.Delete(50) // Delete node with two children
+    
+    fmt.Println("After deletions:", bst.InOrder())
+    // Output: [40 60 70 80]
+    
+    // Validate BST property
+    fmt.Println("Is valid BST:", bst.Validate()) // Output: true
+}
+```
+
+### Sorted Data Management
+
+```go
+package main
+
+import (
+    "fmt"
+    "github.com/raj1kshtz/go-structurarium/tree"
+)
+
+func main() {
+    // BST for maintaining sorted strings
+    wordTree := tree.NewBSTWrapper[string]()
+    
+    // Insert words
+    words := []string{"dog", "cat", "elephant", "ant", "bear"}
+    for _, word := range words {
+        wordTree.Insert(word)
+    }
+    
+    // Get words in sorted order
+    fmt.Println("Sorted words:", wordTree.InOrder())
+    // Output: [ant bear cat dog elephant]
+    
+    // Find alphabetically first and last
+    first, _ := wordTree.Min()
+    last, _ := wordTree.Max()
+    fmt.Println("First:", first) // Output: ant
+    fmt.Println("Last:", last)   // Output: elephant
+}
+```
+
+### Student Grades Example
+
+```go
+package main
+
+import (
+    "fmt"
+    "github.com/raj1kshtz/go-structurarium/tree"
+)
+
+func main() {
+    // BST for student scores
+    scores := tree.NewBSTWrapper[int]()
+    
+    // Add test scores
+    testScores := []int{85, 92, 78, 95, 88, 73, 90}
+    for _, score := range testScores {
+        scores.Insert(score)
+    }
+    
+    // Get all scores in sorted order
+    sorted := scores.InOrder()
+    fmt.Println("Scores (sorted):", sorted)
+    
+    // Find median score (middle value)
+    median := sorted[len(sorted)/2]
+    fmt.Println("Median score:", median)
+    
+    // Get highest and lowest scores
+    lowest, _ := scores.Min()
+    highest, _ := scores.Max()
+    fmt.Println("Range:", lowest, "-", highest)
+    
+    // Check if passing grade (60) exists
+    if scores.Search(60) {
+        fmt.Println("Someone got exactly 60")
+    } else {
+        fmt.Println("No one got exactly 60")
+    }
+}
+```
+
+### BST vs Tree Comparison
+
+**When to use N-ary Tree:**
+- Hierarchical data (file systems, org charts)
+- No ordering required
+- Variable number of children per node
+- Tree traversal is more important than search
+
+**When to use BST:**
+- Need efficient search (O(log n) average)
+- Need sorted data
+- Range queries
+- Finding min/max values frequently
+- Exactly two children per node
+
 ## Additional Examples
 
 For more examples, see the `datastructure_helper` package in the repository, which contains helper functions demonstrating various use cases.

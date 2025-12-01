@@ -6,7 +6,6 @@ type collectionRequest[T any] struct {
 	replyChan chan interface{}
 }
 
-// GenericCollection  T to types that support the equality operator
 type GenericCollection[T comparable] struct {
 	collectionChan chan collectionRequest[T]
 	elements       []T
@@ -59,7 +58,6 @@ func (c *GenericCollection[T]) manageCollection() {
 	}
 }
 
-// Private methods (not exported)
 func (c *GenericCollection[T]) add(value T) {
 	c.elements = append(c.elements, value)
 }

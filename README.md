@@ -55,6 +55,25 @@ A key-value store with hash-based lookup:
 - `Keys()`, `Values()` - Get all keys or values
 - `Size()`, `IsEmpty()`, `Clear()`
 
+### Tree (N-ary Tree)
+A generic tree structure supporting any number of children per node:
+- `Insert(parentValue, value)` - Add child to parent
+- `Remove(value)` - Remove node and its subtree
+- `Search(value)` - Check if value exists
+- `PreOrder()`, `PostOrder()`, `LevelOrder()` - Tree traversals
+- `Height()`, `Size()`, `IsEmpty()`, `Clear()`
+
+### Binary Search Tree (BST)
+A self-organizing binary tree with sorted properties:
+- `Insert(value)` - Add value maintaining BST property
+- `Delete(value)` - Remove value with tree restructuring
+- `Search(value)` - Efficient O(log n) search
+- `Min()`, `Max()` - Find minimum/maximum values
+- `InOrder()` - Get sorted sequence of values
+- `PreOrder()`, `PostOrder()`, `LevelOrder()` - Traversals
+- `Height()`, `Size()`, `IsEmpty()`, `Clear()`
+- `Validate()` - Verify BST properties
+
 ## Installation
 
 ```bash
@@ -100,6 +119,7 @@ go-structurarium/
 ├── vector/         # Dynamic array implementation
 ├── collection/     # Generic collection implementation
 ├── maps/           # HashMap implementation
+├── tree/           # Tree structures (N-ary Tree and BST)
 └── datastructure_helper/ # Example usage helpers
 ```
 
