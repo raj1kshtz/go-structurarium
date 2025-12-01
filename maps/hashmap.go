@@ -27,17 +27,14 @@ type GenericHashMap[K comparable, V any] struct {
 	size            int
 }
 
-// NewGenericHashMap creates a new GenericHashMap with default initial capacity and load factor
 func NewGenericHashMap[K comparable, V any]() *GenericHashMap[K, V] {
 	return NewGenericHashMapWithCapacityAndLoadFactor[K, V](16, 0.75)
 }
 
-// NewGenericHashMapWithCapacity creates a new GenericHashMap with specified initial capacity
 func NewGenericHashMapWithCapacity[K comparable, V any](initialCapacity int) *GenericHashMap[K, V] {
 	return NewGenericHashMapWithCapacityAndLoadFactor[K, V](initialCapacity, 0.75)
 }
 
-// NewGenericHashMapWithCapacityAndLoadFactor creates a new GenericHashMap with specified initial capacity and load factor
 func NewGenericHashMapWithCapacityAndLoadFactor[K comparable, V any](initialCapacity int, loadFactor float64) *GenericHashMap[K, V] {
 	hm := &GenericHashMap[K, V]{
 		hashMapChan:     make(chan hashMapRequest[K, V]),

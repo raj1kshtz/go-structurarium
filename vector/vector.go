@@ -167,8 +167,6 @@ func (v *GenericVector[T]) toArray() []T {
 	return (<-replyChan).([]T)
 }
 
-// Wrapper Methods
-
 func (v *GenericVector[T]) Add(value T) error {
 	return v.add(value)
 }
