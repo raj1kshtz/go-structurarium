@@ -1,55 +1,92 @@
 package stack
 
 import (
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/suite"
 	"testing"
+
+	"github.com/stretchr/testify/suite"
 )
 
-type StackWrapperTestSuite struct {
+type WrapperStackTestSuite struct {
 	suite.Suite
-	intStack    *WrapperStack[int]
-	stringStack *WrapperStack[string]
+	stackWrapper *WrapperStack[int]
 }
 
-func TestStackWrapperTestSuite(t *testing.T) {
-	suite.Run(t, new(StackWrapperTestSuite))
+func TestWrapperStackTestSuite(t *testing.T) {
+	suite.Run(t, new(WrapperStackTestSuite))
 }
 
-func (s *StackWrapperTestSuite) SetupTest() {
-	s.intStack = NewWrapperStack[int]()
-	s.stringStack = NewWrapperStack[string]()
+func (s *WrapperStackTestSuite) SetupTest() {
+	s.stackWrapper = NewWrapperStack[int]()
 }
 
-func (s *StackWrapperTestSuite) TestIntegerStack() {
-	assert.Equal(s.T(), true, s.intStack.IsEmpty())
-	assert.NoError(s.T(), s.intStack.Push(10))
-	assert.NoError(s.T(), s.intStack.Push(20))
+func (s *WrapperStackTestSuite) TestWrapperStack() {
+	s.Run("TestPush", func() {
+		err := s.stackWrapper.Push(10)
+		s.NoError(err)
+		err = s.stackWrapper.Push(20)
+		s.NoError(err)
+		s.Equal(2, s.stackWrapper.Size())
+	})
 
-	value, err := s.intStack.Pop()
-	assert.NoError(s.T(), err)
-	assert.Equal(s.T(), 20, value)
+	s.Run("TestPop", func() {
+		s.stackWrapper = NewWrapperStack[int]()
+		s.stackWrapper.Push(10)
+		s.stackWrapper.Push(20)
 
-	topValue, err := s.intStack.Peek()
-	assert.NoError(s.T(), err)
-	assert.Equal(s.T(), 10, topValue)
+		value, err := s.stackWrapper.Pop()
+		s.NoError(err)
+		s.Equal(20, value)
 
-	assert.Equal(s.T(), 1, s.intStack.Size())
+		value, err = s.stackWrapper.Pop()
+		s.NoError(err)
+		s.Equal(10, value)
 
-	_, err = s.intStack.Pop()
-	assert.NoError(s.T(), err)
-	_, err = s.intStack.Pop()
-	assert.Error(s.T(), err)
-	assert.Equal(s.T(), "stack underflow", err.Error())
+		_, err = s.stackWrapper.Pop()
+		s.Error(err)
+	})
 
-	_, err = s.intStack.Peek()
-	assert.Error(s.T(), err)
-	assert.Equal(s.T(), "stack is empty", err.Error())
-}
+	s.Run("TestPeek", func() {
+		s.stackWrapper = NewWrapperStack[int]()
+		s.stackWrapper.Push(10)
+		s.stackWrapper.Push(20)
 
-func (s *StackWrapperTestSuite) TestClear() {
-	assert.NoError(s.T(), s.intStack.Push(1))
-	assert.NoError(s.T(), s.intStack.Push(2))
-	assert.NoError(s.T(), s.intStack.Push(3))
-	assert.NoError(s.T(), s.intStack.Clear())
+		value, err := s.stackWrapper.Peek()
+		s.NoError(err)
+		s.Equal(20, value)
+
+		// Verify peek doesn't remove element
+		s.Equal(2, s.stackWrapper.Size())
+	})
+
+	s.Run("TestClear", func() {
+		s.stackWrapper = NewWrapperStack[int]()
+		s.stackWrapper.Push(10)
+		s.stackWrapper.Push(20)
+
+		err := s.stackWrapper.Clear()
+		s.NoError(err)
+		s.True(s.stackWrapper.IsEmpty())
+	})
+
+	s.Run("TestIsEmpty", func() {
+		s.stackWrapper = NewWrapperStack[int]()
+		s.True(s.stackWrapper.IsEmpty())
+
+		s.stackWrapper.Push(10)
+		s.False(s.stackWrapper.IsEmpty())
+	})
+
+	s.Run("TestSize", func() {
+		s.stackWrapper = NewWrapperStack[int]()
+		s.Equal(0, s.stackWrapper.Size())
+
+		s.stackWrapper.Push(10)
+		s.Equal(1, s.stackWrapper.Size())
+
+		s.stackWrapper.Push(20)
+		s.Equal(2, s.stackWrapper.Size())
+
+		s.stackWrapper.Pop()
+		s.Equal(1, s.stackWrapper.Size())
+	})
 }

@@ -39,10 +39,10 @@ func (w *GenericQueueWrapper[T]) Clear() {
 	w.queue.queueChan <- queueRequest[T]{action: "clear", replyChan: replyChan}
 }
 
-func (w *GenericQueueWrapper[T]) Peek() int {
+func (w *GenericQueueWrapper[T]) Peek() T {
 	replyChan := make(chan interface{})
 	w.queue.queueChan <- queueRequest[T]{action: "peek", replyChan: replyChan}
-	return (<-replyChan).(int)
+	return (<-replyChan).(T)
 }
 
 func (w *GenericQueueWrapper[T]) ToArray() []T {

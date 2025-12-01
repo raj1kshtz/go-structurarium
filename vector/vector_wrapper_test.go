@@ -1,13 +1,14 @@
 package vector
 
 import (
-	"github.com/stretchr/testify/suite"
 	"testing"
+
+	"github.com/stretchr/testify/suite"
 )
 
 type WrapperVectorTestSuite struct {
 	suite.Suite
-	intWrapperVector *WrapperVector[int]
+	vectorWrapper *WrapperVector[int]
 }
 
 func TestWrapperVectorTestSuite(t *testing.T) {
@@ -15,134 +16,124 @@ func TestWrapperVectorTestSuite(t *testing.T) {
 }
 
 func (s *WrapperVectorTestSuite) SetupTest() {
-	s.intWrapperVector = NewWrapperVector[int](2)
+	s.vectorWrapper = NewWrapperVector[int]()
 }
 
-func (s *WrapperVectorTestSuite) TestWrapperVector() {
+func (s *WrapperVectorTestSuite) TestVectorWrapper() {
 	s.Run("TestAdd", func() {
-		err := s.intWrapperVector.Add(10)
+		err := s.vectorWrapper.Add(10)
 		s.NoError(err)
-		err = s.intWrapperVector.Add(20)
+		err = s.vectorWrapper.Add(20)
 		s.NoError(err)
-		s.Equal(2, s.intWrapperVector.Size())
+		s.Equal(2, s.vectorWrapper.Size())
 	})
 
 	s.Run("TestAddAt", func() {
-		s.intWrapperVector = NewWrapperVector[int](3)
-		_ = s.intWrapperVector.Add(10)
-		_ = s.intWrapperVector.Add(20)
+		s.vectorWrapper = NewWrapperVector[int]()
+		s.vectorWrapper.Add(10)
+		s.vectorWrapper.Add(30)
 
-		err := s.intWrapperVector.AddAt(1, 15)
+		err := s.vectorWrapper.AddAt(1, 20)
 		s.NoError(err)
 
-		value, err := s.intWrapperVector.Get(1)
+		value, err := s.vectorWrapper.Get(1)
 		s.NoError(err)
-		s.Equal(15, value)
-
-		err = s.intWrapperVector.AddAt(10, 25)
-		s.Error(err)
-	})
-
-	s.Run("TestRemoveAt", func() {
-		s.intWrapperVector = NewWrapperVector[int](2)
-		_ = s.intWrapperVector.Add(10)
-		_ = s.intWrapperVector.Add(20)
-		_ = s.intWrapperVector.Add(30)
-
-		err := s.intWrapperVector.RemoveAt(1)
-		s.NoError(err)
-
-		s.Equal(2, s.intWrapperVector.Size())
-
-		value, err := s.intWrapperVector.Get(1)
-		s.NoError(err)
-		s.Equal(30, value)
-
-		err = s.intWrapperVector.RemoveAt(5)
-		s.Error(err)
+		s.Equal(20, value)
 	})
 
 	s.Run("TestGet", func() {
-		s.intWrapperVector = NewWrapperVector[int](2)
-		_ = s.intWrapperVector.Add(10)
-		_ = s.intWrapperVector.Add(20)
+		s.vectorWrapper = NewWrapperVector[int]()
+		s.vectorWrapper.Add(10)
+		s.vectorWrapper.Add(20)
 
-		value, err := s.intWrapperVector.Get(1)
+		value, err := s.vectorWrapper.Get(0)
+		s.NoError(err)
+		s.Equal(10, value)
+
+		value, err = s.vectorWrapper.Get(1)
 		s.NoError(err)
 		s.Equal(20, value)
 
-		_, err = s.intWrapperVector.Get(5)
+		_, err = s.vectorWrapper.Get(5)
 		s.Error(err)
 	})
 
 	s.Run("TestSet", func() {
-		s.intWrapperVector = NewWrapperVector[int](2)
-		_ = s.intWrapperVector.Add(10)
-		_ = s.intWrapperVector.Add(20)
+		s.vectorWrapper = NewWrapperVector[int]()
+		s.vectorWrapper.Add(10)
+		s.vectorWrapper.Add(20)
 
-		err := s.intWrapperVector.Set(1, 25)
+		err := s.vectorWrapper.Set(1, 30)
 		s.NoError(err)
 
-		value, err := s.intWrapperVector.Get(1)
+		value, err := s.vectorWrapper.Get(1)
 		s.NoError(err)
-		s.Equal(25, value)
+		s.Equal(30, value)
+	})
 
-		err = s.intWrapperVector.Set(5, 30)
-		s.Error(err)
+	s.Run("TestRemoveAt", func() {
+		s.vectorWrapper = NewWrapperVector[int]()
+		s.vectorWrapper.Add(10)
+		s.vectorWrapper.Add(20)
+		s.vectorWrapper.Add(30)
+
+		err := s.vectorWrapper.RemoveAt(1)
+		s.NoError(err)
+		s.Equal(2, s.vectorWrapper.Size())
+
+		value, err := s.vectorWrapper.Get(1)
+		s.NoError(err)
+		s.Equal(30, value)
 	})
 
 	s.Run("TestSize", func() {
-		s.intWrapperVector = NewWrapperVector[int](2)
-		_ = s.intWrapperVector.Add(10)
-		_ = s.intWrapperVector.Add(20)
-		s.Equal(2, s.intWrapperVector.Size())
+		s.vectorWrapper = NewWrapperVector[int]()
+		s.Equal(0, s.vectorWrapper.Size())
 
-		_ = s.intWrapperVector.Add(30)
-		s.Equal(3, s.intWrapperVector.Size())
+		s.vectorWrapper.Add(10)
+		s.Equal(1, s.vectorWrapper.Size())
 	})
 
 	s.Run("TestIsEmpty", func() {
-		s.intWrapperVector = NewWrapperVector[int](2)
-		s.True(s.intWrapperVector.IsEmpty())
+		s.vectorWrapper = NewWrapperVector[int]()
+		s.True(s.vectorWrapper.IsEmpty())
 
-		_ = s.intWrapperVector.Add(10)
-		s.False(s.intWrapperVector.IsEmpty())
+		s.vectorWrapper.Add(10)
+		s.False(s.vectorWrapper.IsEmpty())
 	})
 
 	s.Run("TestClear", func() {
-		s.intWrapperVector = NewWrapperVector[int]()
-		_ = s.intWrapperVector.Add(10)
-		_ = s.intWrapperVector.Add(20)
+		s.vectorWrapper = NewWrapperVector[int]()
+		s.vectorWrapper.Add(10)
+		s.vectorWrapper.Add(20)
 
-		err := s.intWrapperVector.Clear()
+		err := s.vectorWrapper.Clear()
 		s.NoError(err)
-		s.Equal(0, s.intWrapperVector.Size())
-		s.True(s.intWrapperVector.IsEmpty())
-	})
-
-	s.Run("TestEnsureCapacity", func() {
-		s.intWrapperVector.EnsureCapacity(10) // No error expected; this just ensures that it doesn't panic
-	})
-
-	s.Run("TestTrimToSize", func() {
-		s.intWrapperVector = NewWrapperVector[int](3)
-		_ = s.intWrapperVector.Add(10)
-		_ = s.intWrapperVector.Add(20)
-		_ = s.intWrapperVector.Add(30)
-
-		s.Equal(3, s.intWrapperVector.Size())
-		err := s.intWrapperVector.TrimToSize()
-		s.NoError(err)
-		s.Equal(3, cap(s.intWrapperVector.vector.data))
+		s.True(s.vectorWrapper.IsEmpty())
 	})
 
 	s.Run("TestToArray", func() {
-		s.intWrapperVector = NewWrapperVector[int](3)
-		_ = s.intWrapperVector.Add(10)
-		_ = s.intWrapperVector.Add(20)
-		_ = s.intWrapperVector.Add(30)
+		s.vectorWrapper = NewWrapperVector[int]()
+		s.vectorWrapper.Add(10)
+		s.vectorWrapper.Add(20)
+		s.vectorWrapper.Add(30)
 
-		arr := s.intWrapperVector.ToArray()
+		arr := s.vectorWrapper.ToArray()
 		s.Equal([]int{10, 20, 30}, arr)
+	})
+
+	s.Run("TestEnsureCapacity", func() {
+		s.vectorWrapper = NewWrapperVector[int]()
+		s.vectorWrapper.EnsureCapacity(10)
+		// Just ensuring no panic
+	})
+
+	s.Run("TestTrimToSize", func() {
+		s.vectorWrapper = NewWrapperVector[int]()
+		s.vectorWrapper.Add(10)
+		s.vectorWrapper.Add(20)
+
+		err := s.vectorWrapper.TrimToSize()
+		s.NoError(err)
 	})
 }

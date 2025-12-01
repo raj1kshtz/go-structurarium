@@ -1,0 +1,150 @@
+name: Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  test:
+    name: Test on Go ${{ matrix.go-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go-version: ['1.21', '1.22', '1.23']
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: ${{ matrix.go-version }}
+    
+    - name: Cache Go modules
+      uses: actions/cache@v3
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+    
+    - name: Download dependencies
+      run: go mod download
+    
+    - name: Run go vet
+      run: go vet ./...
+    
+    - name: Run tests with coverage
+      run: go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
+    
+    - name: Generate coverage report
+      if: matrix.go-version == '1.23'
+      run: |
+        go tool cover -func=coverage.txt -o=coverage.out
+        echo "## Test Coverage Report" >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+        cat coverage.out >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+        
+        # Calculate total coverage
+        COVERAGE=$(go tool cover -func=coverage.txt | grep total | awk '{print $3}')
+        echo "**Total Coverage: $COVERAGE**" >> $GITHUB_STEP_SUMMARY
+    
+    - name: Upload coverage to Codecov
+      if: matrix.go-version == '1.23'
+      uses: codecov/codecov-action@v3
+      with:
+        files: ./coverage.txt
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+    
+    - name: Comment PR with coverage
+      if: github.event_name == 'pull_request' && matrix.go-version == '1.23'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const coverage = fs.readFileSync('coverage.out', 'utf8');
+          const totalLine = coverage.split('\n').find(line => line.includes('total'));
+          const totalCoverage = totalLine ? totalLine.split(/\s+/)[2] : 'N/A';
+          
+          const comment = `## 📊 Test Coverage Report
+          
+          **Total Coverage: ${totalCoverage}**
+          
+          <details>
+          <summary>View detailed coverage</summary>
+          
+          \`\`\`
+          ${coverage}
+          \`\`\`
+          
+          </details>
+          
+          Coverage report generated for commit: ${{ github.event.pull_request.head.sha }}
+          `;
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.23'
+    
+    - name: Run golangci-lint
+      uses: golangci/golangci-lint-action@v3
+      with:
+        version: latest
+        args: --timeout=5m
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.23'
+    
+    - name: Build
+      run: go build -v ./...
+  
+  test-summary:
+    name: Test Summary
+    runs-on: ubuntu-latest
+    needs: [test, lint, build]
+    if: always()
+    steps:
+    - name: Check test results
+      run: |
+        if [ "${{ needs.test.result }}" != "success" ] || [ "${{ needs.lint.result }}" != "success" ] || [ "${{ needs.build.result }}" != "success" ]; then
+          echo "❌ Some checks failed!"
+          exit 1
+        else
+          echo "✅ All checks passed!"
+        fi
+

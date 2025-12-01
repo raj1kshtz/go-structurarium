@@ -1,4 +1,4 @@
-module go-structurarium
+module github.com/raj1kshtz/go-structurarium
 
 go 1.23.2
 

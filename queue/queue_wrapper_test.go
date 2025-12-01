@@ -1,55 +1,97 @@
 package queue
 
 import (
-	"github.com/stretchr/testify/suite"
 	"testing"
+
+	"github.com/stretchr/testify/suite"
 )
 
 type GenericQueueWrapperTestSuite struct {
 	suite.Suite
-	intQueue *GenericQueueWrapper[int]
+	queueWrapper *GenericQueueWrapper[int]
 }
 
-func TestGenericWrapperQueueSuite(t *testing.T) {
+func TestGenericQueueWrapperTestSuite(t *testing.T) {
 	suite.Run(t, new(GenericQueueWrapperTestSuite))
 }
 
-func (t *GenericQueueWrapperTestSuite) SetupTest() {
-	t.intQueue = NewGenericQueueWrapper[int]()
+func (s *GenericQueueWrapperTestSuite) SetupTest() {
+	s.queueWrapper = NewGenericQueueWrapper[int]()
 }
 
-func (t *GenericQueueWrapperTestSuite) TestQueueWrapper() {
-	t.Run("TestIsEmpty", func() {
-		t.True(t.intQueue.IsEmpty())
+func (s *GenericQueueWrapperTestSuite) TestQueueWrapper() {
+	s.Run("TestEnqueue", func() {
+		success := s.queueWrapper.Enqueue(10)
+		s.True(success)
+		success = s.queueWrapper.Enqueue(20)
+		s.True(success)
+		s.Equal(2, s.queueWrapper.Size())
 	})
 
-	t.Run("TestEnqueue", func() {
-		t.True(t.intQueue.Enqueue(1))
-		t.True(t.intQueue.Enqueue(2))
+	s.Run("TestDequeue", func() {
+		s.queueWrapper = NewGenericQueueWrapper[int]()
+		s.queueWrapper.Enqueue(10)
+		s.queueWrapper.Enqueue(20)
+
+		value, success := s.queueWrapper.Dequeue()
+		s.True(success)
+		s.Equal(10, value)
+
+		value, success = s.queueWrapper.Dequeue()
+		s.True(success)
+		s.Equal(20, value)
+
+		_, success = s.queueWrapper.Dequeue()
+		s.False(success)
 	})
 
-	t.Run("TestQueueToArray", func() {
-		vals := t.intQueue.ToArray()
-		t.Equal([]int{1, 2}, vals)
+	s.Run("TestPeek", func() {
+		s.queueWrapper = NewGenericQueueWrapper[int]()
+		s.queueWrapper.Enqueue(10)
+		s.queueWrapper.Enqueue(20)
+
+		value := s.queueWrapper.Peek()
+		s.Equal(10, value)
+
+		// Verify peek doesn't remove element
+		s.Equal(2, s.queueWrapper.Size())
 	})
 
-	t.Run("TestDequeue", func() {
-		val, ok := t.intQueue.Dequeue()
-		t.True(ok)
-		t.Equal(1, val)
+	s.Run("TestSize", func() {
+		s.queueWrapper = NewGenericQueueWrapper[int]()
+		s.Equal(0, s.queueWrapper.Size())
+
+		s.queueWrapper.Enqueue(10)
+		s.Equal(1, s.queueWrapper.Size())
+
+		s.queueWrapper.Enqueue(20)
+		s.Equal(2, s.queueWrapper.Size())
 	})
 
-	t.Run("TestQueueSize", func() {
-		t.Equal(1, t.intQueue.Size())
+	s.Run("TestIsEmpty", func() {
+		s.queueWrapper = NewGenericQueueWrapper[int]()
+		s.True(s.queueWrapper.IsEmpty())
+
+		s.queueWrapper.Enqueue(10)
+		s.False(s.queueWrapper.IsEmpty())
 	})
 
-	t.Run("TestQueuePeek", func() {
-		val := t.intQueue.Peek()
-		t.Equal(2, val)
+	s.Run("TestClear", func() {
+		s.queueWrapper = NewGenericQueueWrapper[int]()
+		s.queueWrapper.Enqueue(10)
+		s.queueWrapper.Enqueue(20)
+
+		s.queueWrapper.Clear()
+		s.True(s.queueWrapper.IsEmpty())
 	})
 
-	t.Run("TestQueueClear", func() {
-		t.intQueue.Clear()
-		t.Equal(0, t.intQueue.Size())
+	s.Run("TestToArray", func() {
+		s.queueWrapper = NewGenericQueueWrapper[int]()
+		s.queueWrapper.Enqueue(10)
+		s.queueWrapper.Enqueue(20)
+		s.queueWrapper.Enqueue(30)
+
+		arr := s.queueWrapper.ToArray()
+		s.Equal([]int{10, 20, 30}, arr)
 	})
 }

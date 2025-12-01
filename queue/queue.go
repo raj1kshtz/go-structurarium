@@ -1,7 +1,7 @@
 package queue
 
 import (
-	"go-structurarium/collection"
+	"github.com/raj1kshtz/go-structurarium/collection"
 )
 
 type queueRequest[T comparable] struct {

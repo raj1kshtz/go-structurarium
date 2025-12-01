@@ -2,7 +2,8 @@ package stack
 
 import (
 	"fmt"
-	"go-structurarium/vector"
+
+	"github.com/raj1kshtz/go-structurarium/vector"
 )
 
 type stackRequest[T any] struct {

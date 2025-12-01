@@ -2,7 +2,8 @@ package datastructure_helper
 
 import (
 	"fmt"
-	"go-structurarium/stack"
+
+	"github.com/raj1kshtz/go-structurarium/stack"
 )
 
 func StackWrapperHelper() {
