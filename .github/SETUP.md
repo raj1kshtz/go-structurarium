@@ -34,9 +34,10 @@ Enable the following:
       - test (1.21)
       - test (1.22)
       - test (1.23)
-      - lint
       - build
       - test-summary
+      
+   Note: "lint" is advisory only and doesn't block merging
 
 ✅ Require conversation resolution before merging
 

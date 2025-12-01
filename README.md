@@ -2,8 +2,6 @@
 
 [![Go Version](https://img.shields.io/badge/Go-1.18%2B-blue.svg)](https://golang.org/dl/)
 [![Tests](https://github.com/raj1kshtz/go-structurarium/workflows/Tests/badge.svg)](https://github.com/raj1kshtz/go-structurarium/actions)
-[![codecov](https://codecov.io/gh/raj1kshtz/go-structurarium/branch/main/graph/badge.svg)](https://codecov.io/gh/raj1kshtz/go-structurarium)
-[![Go Report Card](https://goreportcard.com/badge/github.com/raj1kshtz/go-structurarium)](https://goreportcard.com/report/github.com/raj1kshtz/go-structurarium)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A comprehensive Go library providing thread-safe, generic data structures with clean, easy-to-use APIs. Built with Go generics, this library offers type-safe implementations of common data structures including stacks, queues, vectors, collections, and hash maps.

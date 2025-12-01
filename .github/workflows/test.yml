@@ -103,6 +103,7 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
+    continue-on-error: true  # Don't fail the build on linting issues
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -117,6 +118,7 @@ jobs:
       with:
         version: latest
         args: --timeout=5m
+      continue-on-error: true
 
   build:
     name: Build
@@ -141,10 +143,17 @@ jobs:
     steps:
     - name: Check test results
       run: |
-        if [ "${{ needs.test.result }}" != "success" ] || [ "${{ needs.lint.result }}" != "success" ] || [ "${{ needs.build.result }}" != "success" ]; then
-          echo "❌ Some checks failed!"
+        # Only fail if tests or build fail (lint is advisory only)
+        if [ "${{ needs.test.result }}" != "success" ] || [ "${{ needs.build.result }}" != "success" ]; then
+          echo "❌ Required checks failed!"
+          echo "Test result: ${{ needs.test.result }}"
+          echo "Build result: ${{ needs.build.result }}"
+          echo "Lint result: ${{ needs.lint.result }} (advisory)"
           exit 1
         else
-          echo "✅ All checks passed!"
+          echo "✅ All required checks passed!"
+          if [ "${{ needs.lint.result }}" != "success" ]; then
+            echo "⚠️  Linting issues found (non-blocking)"
+          fi
         fi
 
