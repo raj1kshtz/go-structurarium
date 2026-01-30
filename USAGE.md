@@ -571,6 +571,73 @@ func main() {
 }
 ```
 
+
+## Graph (Undirected & Directed)
+
+A thread-safe, generic graph data structure supporting both undirected and directed graphs.
+
+### Basic Usage (Undirected)
+
+```go
+package main
+
+import (
+    "fmt"
+    "github.com/raj1kshtz/go-structurarium/graph"
+)
+
+func main() {
+    g := graph.NewUndirectedGraph[int, string]()
+    g.AddVertex(1)
+    g.AddVertex(2)
+    g.AddEdge(1, 2, "edge-label")
+    fmt.Println("Has edge 1-2:", g.HasEdge(1, 2)) // Output: true
+    fmt.Println("Neighbors of 1:", g.Neighbors(1)) // Output: [2]
+    g.RemoveEdge(1, 2)
+    fmt.Println("Has edge 1-2 after removal:", g.HasEdge(1, 2)) // Output: false
+}
+```
+
+### Basic Usage (Directed)
+
+```go
+package main
+
+import (
+    "fmt"
+    "github.com/raj1kshtz/go-structurarium/graph"
+)
+
+func main() {
+    g := graph.NewDirectedGraph[int, string]()
+    g.AddVertex(1)
+    g.AddVertex(2)
+    g.AddEdge(1, 2, "edge-label")
+    fmt.Println("Has edge 1->2:", g.HasEdge(1, 2)) // Output: true
+    fmt.Println("Has edge 2->1:", g.HasEdge(2, 1)) // Output: false
+    fmt.Println("Neighbors of 1:", g.Neighbors(1)) // Output: [2]
+    fmt.Println("Neighbors of 2:", g.Neighbors(2)) // Output: []
+}
+```
+
+### Basic Usage (Wrapper)
+
+```go
+package main
+
+import (
+    "github.com/raj1kshtz/go-structurarium/graph"
+)
+
+func main() {
+    gw := graph.NewGraphWrapper[int, string]()
+    gw.AddVertex(1)
+    gw.AddVertex(2)
+    gw.AddEdge(1, 2, "edge-label")
+    // ...
+}
+```
+
 ## Tree (N-ary Tree)
 
 A generic tree structure where each node can have any number of children.
