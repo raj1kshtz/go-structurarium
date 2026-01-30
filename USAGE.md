@@ -10,6 +10,7 @@ This guide demonstrates how to use go-structurarium in your Go projects.
 - [Vector](#vector)
 - [Collection](#collection)
 - [HashMap](#hashmap)
+- [Graph](#graph)
 - [Error Handling](#error-handling)
 - [Custom Types](#custom-types)
 
