@@ -120,6 +120,7 @@ go-structurarium/
 ├── collection/     # Generic collection implementation
 ├── maps/           # HashMap implementation
 ├── tree/           # Tree structures (N-ary Tree and BST)
+├── graph/          # Graph data structures (Undirected, Directed, Wrapper)
 └── datastructure_helper/ # Example usage helpers
 ```
 
