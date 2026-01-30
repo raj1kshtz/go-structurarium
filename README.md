@@ -74,6 +74,18 @@ A self-organizing binary tree with sorted properties:
 - `Height()`, `Size()`, `IsEmpty()`, `Clear()`
 - `Validate()` - Verify BST properties
 
+
+### Graph (Undirected & Directed)
+A generic, type-safe graph data structure supporting both undirected and directed graphs:
+- `AddVertex(node)` - Add a node to the graph
+- `RemoveVertex(node)` - Remove a node and its edges
+- `AddEdge(from, to, edge)` - Add an edge (undirected or directed)
+- `RemoveEdge(from, to)` - Remove an edge
+- `Neighbors(node)` - Get all neighbors of a node
+- `HasVertex(node)`, `HasEdge(from, to)` - Existence checks
+- `Vertices()`, `Edges()` - List all nodes or edges
+- Supports: UndirectedGraph, DirectedGraph, and GraphWrapper types
+
 ## Installation
 
 ```bash
